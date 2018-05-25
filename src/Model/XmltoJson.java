@@ -2,35 +2,107 @@ package Model;
 
 import java.io.*;
 import java.util.*;
+
+import jdk.nashorn.internal.parser.JSONParser;
 import org.json.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 
 /*
   JSON library provided by json.org (http://www.json.org/)
 */
 
 public class XmltoJson {
-    public static void main(String[] args) {
-        int i=0,size=args.length;
 
+    public String jsonInicial = "";
+
+    public void XMLtoJSON(String filePath, String filename) {
         try {
-            while (i<size) {
-                String XMLString="";
-                XMLString = new Scanner( new File(args[i]),"UTF-8").useDelimiter("\\A").next();
+            String XMLString = "";
+            XMLString = new Scanner(new File(filePath), "UTF-8").useDelimiter("\\A").next();
+            Document doc = Jsoup.parse(XMLString, "", Parser.xmlParser());
+            String jsonFinal = "";
+            for (Element e : doc.select("REUTERS")) {
                 JSONObject jsonObj = null;
-                jsonObj = XML.toJSONObject(XMLString);
-                String json = jsonObj.toString();
-                if (!json.equals("{}")) {
-                    try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream("C:/Users/mena9/Desktop/json1.json"), "utf-8"))) {
-                        writer.write(json);
-                    }
-                    catch (Exception e){
-
-                    }
-                }
+                jsonObj = XML.toJSONObject(e.toString());
+                jsonFinal += jsonObj.toString() + "\n";
+            }
+            String json = "";
+            //writeJSON(jsonFinal, "C:/Users/mena9/Desktop/a.json");/*
+            String[] docs = jsonFinal.split("\n");
+            int i = 0;
+            for (String s : docs) {
+                json += "{";
+                JSONObject obj = new JSONObject(s).getJSONObject("REUTERS");
+                json += "\"_id\":" + obj.getInt("NEWID") + ", "; //String newidContent
+                json += "\"DATE\": \"" + parseTag(obj, "DATE", false) + "\", "; //String dateContent
+                json += "\"TOPICS\": " + parseTag(obj, "TOPICS", true) + ", "; //String topicsContent
+                json += "\"PLACES\": " + parseTag(obj, "PLACES", true) + ", "; //String placesContent
+                json += "\"PEOPLE\": " + parseTag(obj, "PEOPLE",true) + ", "; //String peopleContent
+                json += "\"ORGS\": " + parseTag(obj, "ORGS", true) + ", "; //String orgsContent
+                json += "\"EXCHANGES\": " + parseTag(obj, "EXCHANGES", true) + ", "; //String exchangesContent
+                json += "\"TITLE\": \"" + parseTag(obj.getJSONObject("TEXT"), "TITLE", false) + "\", "; //String titleContent
+                json += "\"AUTHOR\": \"" + parseTag(obj.getJSONObject("TEXT"), "AUTHOR", false) + "\", "; //String authorContent
+                json += "\"DATELINE\": \"" + parseTag(obj.getJSONObject("TEXT"), "DATELINE", false) + "\", "; //String datelineContent
+                json += "\"BODY\": \"" + parseTag(obj.getJSONObject("TEXT"), "BODY", false) + "\""; //String bodyContent
+                json += "}";
+                writeJSON(json, filename + "_" + String.valueOf(i) + ".json");
+                json = "";
                 i++;
             }
-        } catch (FileNotFoundException e) {
-        } catch (JSONException e) {}
+        }
+        catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public void writeJSON(String json, String filename){
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(filename), "utf-8"))) {
+            writer.write(json);
+        }
+        catch (FileNotFoundException e){}
+        catch (UnsupportedEncodingException e){}
+        catch (IOException e) {}
+    }
+
+    public String parseTag(JSONObject json, String tag, boolean isArray){
+        String content = "";
+        if(isArray){
+            Object o = json.get(tag);
+            if(o instanceof JSONObject){
+                Object contenidoD = ((JSONObject) o).get("D");
+                if(contenidoD instanceof JSONArray){
+                    return ((JSONArray) contenidoD).toString();
+                }
+                else{
+                    return (String) contenidoD;
+                }
+            }
+            else if(o instanceof JSONArray){
+                if(((JSONArray) o).get(0).equals("NO"))
+                    return "[]";
+                else{
+                    Object o1 = ((JSONArray) o).get(1);
+                    if(o1.toString().equals(""))
+                        return "[]";
+                    return ((JSONObject) o1).get("D").toString();
+                }
+            }
+            else
+                return "[]";
+        }
+        else{
+            try{
+                content = json.getString(tag);
+            }
+            catch (JSONException e){
+                content = "";
+            }
+        }
+        return content.replace("\"", "");
     }
 }
