@@ -14,9 +14,7 @@ import javafx.scene.control.TextField;
 import org.json.*;
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class ControllerMain implements Initializable {
@@ -37,7 +35,7 @@ public class ControllerMain implements Initializable {
     @FXML
     public ComboBox preQuery;
     @FXML
-    public Button clear;
+    public Button mapReduce;
 
     private MongoConnection mongo = new MongoConnection();
     private XmltoJson conversor = new XmltoJson();
@@ -133,8 +131,18 @@ public class ControllerMain implements Initializable {
                 t.start();
             }
         });
-        clear.setOnAction(event -> {
-            console.setText("");
+        mapReduce.setOnAction(event -> {
+            Task task = new Task() {
+                @Override
+                protected Void call() throws Exception {
+                    String aux = mongo.mapReduce();
+                    this.updateMessage(aux);
+                    return null;
+                }
+            };
+            Thread t = new Thread(task);
+            console.textProperty().bind(task.messageProperty());
+            t.start();
         });
     }
 

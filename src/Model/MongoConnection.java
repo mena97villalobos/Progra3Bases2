@@ -1,6 +1,6 @@
 package Model;
 
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -18,11 +18,12 @@ import java.util.Scanner;
 
 public class MongoConnection {
 
-    public MongoClient mongoClient = MongoClients.create();
-    public MongoDatabase db = mongoClient.getDatabase("Progra3");
+    private MongoClient mongoClient = MongoClients.create();
+    private MongoDatabase db = mongoClient.getDatabase("Progra3");
     public MongoCollection collection;
-    public String collectionName = "";
-    public static int agregados = 0;
+    private String collectionName = "";
+    private static int agregados = 0;
+
 
     public String buscar(String query){
         String results = "";
@@ -82,7 +83,35 @@ public class MongoConnection {
     }
 
     public String mapReduce(){
-        return null;
+        com.mongodb.MongoClient client = new com.mongodb.MongoClient(new ServerAddress("localhost", 27017));
+        DB databaseMR = client.getDB("Progra3");
+        DBCollection dbCollection = databaseMR.getCollection(this.collectionName);
+        String map = "function() {\n" +
+                    "try{\n"+
+                    "for(var i = 0; i < this.PLACES.length; i++ ){\n" +
+                        "var key = this.PLACES[i];\n" +
+                        "emit(key, 1);\n" +
+                    "}\n" +
+                    "}" +
+                    "catch(err){\n"+
+                    "emit(\"UNKOWN\", 1)" +
+                    "}"+
+                "}";
+        String reduce = "function(key, values){\n" +
+                    "return Array.sum(values);\n" +
+                "}";
+        MapReduceCommand cmd = new MapReduceCommand(dbCollection, map, reduce,null, MapReduceCommand.OutputType.INLINE, null);
+        MapReduceOutput out = dbCollection.mapReduce(cmd);
+        String results = "Map Reduce results\n";
+        try{
+            for(DBObject o : out.results()){
+                results += o.toString() + "\n";
+            }
+            return results;
+        }
+        catch (Exception e){
+            return "Error";
+        }
     }
 
 }
