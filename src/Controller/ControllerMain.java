@@ -93,10 +93,10 @@ public class ControllerMain implements Initializable {
                         String aux = mongo.cargarDatos(creados);
                         this.updateMessage(console.getText() + "\n" + aux);
                         for (ArrayFields field : ArrayFields.values()) {
-                            this.updateMessage(console.getText() + "\n" + "Creando indice para: " + field.toString());
                             aux = mongo.crearIndex(field.toString());
                             this.updateMessage(console.getText() + "\n" + aux);
                         }
+                        this.updateMessage(console.getText() + "\n" + mongo.createTextIndex());
                         filePath.setDisable(false);
                         collName.setDisable(false);
                         load.setDisable(false);
@@ -134,7 +134,7 @@ public class ControllerMain implements Initializable {
             }
         });
         clear.setOnAction(event -> {
-            console.clear();
+            console.setText("");
         });
     }
 

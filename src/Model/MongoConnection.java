@@ -65,6 +65,12 @@ public class MongoConnection {
         return estado;
     }
 
+    public String createTextIndex(){
+        collection.createIndex(Indexes.text("TITLE"));
+        collection.createIndex(Indexes.text("BODY"));
+        return "Indices de texto sobre TITLE Y BODY creados";
+    }
+
     public String crearIndex(String field){
         try {
             collection.createIndex(Indexes.ascending(field));
@@ -74,4 +80,9 @@ public class MongoConnection {
             return "Error al crear indice en el campo: " + field;
         }
     }
+
+    public String mapReduce(){
+        return null;
+    }
+
 }
