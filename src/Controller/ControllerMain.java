@@ -44,12 +44,13 @@ public class ControllerMain implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         ArrayList<String> preQuerys = new ArrayList<>();
         preQuerys.add("{\"TOPICS\":{$all:[\"sugar\"]}, \"PLACES\":{$all:[\"indonesia\"]}}");
-        preQuerys.add("{$text : {$search : \"colombia coffee\"}}");
+        preQuerys.add("{$text : {$search : \"\\\"colombia\\\" \\\"coffee\\\"\"}}");
         preQuery.setItems(FXCollections.observableArrayList(preQuerys));
         load.setDisable(true);
         filePath.setDisable(true);
         search.setDisable(true);
         query.setDisable(true);
+        mapReduce.setDisable(true);
         save.setOnAction(event -> {
             String collection = collName.getText();
             if(collection != "") {
@@ -58,6 +59,7 @@ public class ControllerMain implements Initializable {
                 filePath.setDisable(false);
                 search.setDisable(false);
                 query.setDisable(false);
+                mapReduce.setDisable(false);
                 save.setDisable(true);
                 collName.setDisable(true);
             }
@@ -121,7 +123,7 @@ public class ControllerMain implements Initializable {
                     @Override
                     protected Void call() throws Exception {
                         if (isJSONValid(queryFinal)) {
-                            this.updateMessage(console.getText() + "\n" + mongo.buscar(queryFinal));
+                            this.updateMessage(console.getText() + "\nResultados de consulta\n" + mongo.buscar(queryFinal));
                         }
                         return null;
                     }
