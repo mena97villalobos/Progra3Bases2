@@ -94,13 +94,14 @@ public class ControllerMain implements Initializable {
                             this.updateMessage(console.getText() + "\n" + "Conviertiendo: " + f.getName());
                             creados.addAll(conversor.XMLtoJSON(f.getPath(), nombreSalida));
                         }
-                        String aux = mongo.cargarDatos(creados);
-                        this.updateMessage(console.getText() + "\n" + aux);
+                        String message = console.getText() + "\n" + mongo.cargarDatos(creados);
+                        this.updateMessage(message);
                         for (ArrayFields field : ArrayFields.values()) {
-                            aux = mongo.crearIndex(field.toString());
-                            this.updateMessage(console.getText() + "\n" + aux);
+                            mongo.crearIndex(field.toString());
+                            consoleLog(console.getText() + "\n" + "Creando indice para: " + field.toString());
                         }
-                        this.updateMessage(console.getText() + "\n" + mongo.createTextIndex());
+                        mongo.createTextIndex();
+                        this.updateMessage(console.getText() + "\nCreando indices de texto");
                         filePath.setDisable(false);
                         collName.setDisable(false);
                         load.setDisable(false);

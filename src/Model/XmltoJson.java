@@ -1,8 +1,13 @@
+
 package Model;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.json.*;
 import org.jsoup.Jsoup;
@@ -13,12 +18,13 @@ import org.jsoup.parser.Parser;
 public class XmltoJson {
 
     public String jsonInicial = "";
+    public String xmlFile = "";
 
-    public ArrayList XMLtoJSON(String filePath, String filename) {
+    public ArrayList XMLtoJSON(String file, String filename) {
         ArrayList<File> files = new ArrayList<>();
         try {
             String XMLString = "";
-            XMLString = new Scanner(new File(filePath), "UTF-8").useDelimiter("\\A").next();
+            XMLString = readFile(file, Charset.forName("UTF-8"));//new Scanner(file, "UTF-8").next();
             Document doc = Jsoup.parse(XMLString, "", Parser.xmlParser());
             String jsonFinal = "";
             for (Element e : doc.select("REUTERS")) {
@@ -62,6 +68,8 @@ public class XmltoJson {
             }
         }
         catch (FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return files;
@@ -119,5 +127,12 @@ public class XmltoJson {
             }
         }
         return content.replace("\"", "");
+    }
+
+    static String readFile(String path, Charset encoding)
+            throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 }

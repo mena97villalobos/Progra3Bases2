@@ -67,8 +67,7 @@ public class MongoConnection {
     }
 
     public String createTextIndex(){
-        collection.createIndex(Indexes.text("TITLE"));
-        collection.createIndex(Indexes.text("BODY"));
+        collection.createIndex(Document.parse("{TEXT:\"text\", BODY:\"text\"}"));
         return "Indices de texto sobre TITLE Y BODY creados";
     }
 
