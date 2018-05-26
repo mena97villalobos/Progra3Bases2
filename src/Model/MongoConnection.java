@@ -25,11 +25,11 @@ public class MongoConnection {
     private static int agregados = 0;
 
 
-    public String buscar(String query){
+    public String buscar(String query, String projection){
         String results = "";
         ArrayList<Document> aggregation = new ArrayList<>();
         aggregation.add(Document.parse("{$match:" + query + "}"));
-        aggregation.add(Document.parse("{$project:{_id:1, TITLE:1}}"));
+        aggregation.add(Document.parse("{$project:" + projection + "}"));
         for (Object o : collection.aggregate(aggregation)) {
             Document d = (Document) o;
             results += d.toJson() + "\n";

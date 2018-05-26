@@ -36,6 +36,8 @@ public class ControllerMain implements Initializable {
     public ComboBox preQuery;
     @FXML
     public Button mapReduce;
+    @FXML
+    public TextField project;
 
     private MongoConnection mongo = new MongoConnection();
     private XmltoJson conversor = new XmltoJson();
@@ -51,6 +53,7 @@ public class ControllerMain implements Initializable {
         search.setDisable(true);
         query.setDisable(true);
         mapReduce.setDisable(true);
+
         save.setOnAction(event -> {
             String collection = collName.getText();
             if(collection != "") {
@@ -60,12 +63,11 @@ public class ControllerMain implements Initializable {
                 search.setDisable(false);
                 query.setDisable(false);
                 mapReduce.setDisable(false);
-                save.setDisable(true);
-                collName.setDisable(true);
             }
             else
-                console.setText("Collection name needed");
+                consoleLog("Es necesario el nombre de la colección");
         });
+
         load.setOnAction(event -> {
             String pathText = filePath.getText();
             if (pathText != "") {
@@ -73,6 +75,8 @@ public class ControllerMain implements Initializable {
                 collName.setDisable(true);
                 load.setDisable(true);
                 save.setDisable(true);
+                mapReduce.setDisable(true);
+                search.setDisable(true);
                 Task task = new Task() {
                     @Override
                     protected Void call() throws Exception {
@@ -100,6 +104,8 @@ public class ControllerMain implements Initializable {
                         filePath.setDisable(false);
                         collName.setDisable(false);
                         load.setDisable(false);
+                        mapReduce.setDisable(false);
+                        search.setDisable(false);
                         return null;
                     }
                 };
@@ -110,41 +116,32 @@ public class ControllerMain implements Initializable {
             else
                 console.setText("File path needed");
         });
+
         search.setOnAction(event -> {
+            String projection = parseProject();
             String selectedPreQuery = (String) preQuery.getSelectionModel().getSelectedItem();
             String q = query.getText();
-            if(q.equals("") && selectedPreQuery.equals("")){
-                console.setText(console.getText() + "\n" + "No es posible realizar una busqueda");
+            if(q.equals("") && selectedPreQuery == null){
+                consoleLog("No es posible realizar una busqueda");
             }
             else if(q.equals("")){
                 q = selectedPreQuery;
-                final String queryFinal = q;
-                Task task = new Task() {
-                    @Override
-                    protected Void call() throws Exception {
-                        if (isJSONValid(queryFinal)) {
-                            this.updateMessage(console.getText() + "\nResultados de consulta\n" + mongo.buscar(queryFinal));
-                        }
-                        return null;
-                    }
-                };
-                Thread t = new Thread(task);
-                console.textProperty().bind(task.messageProperty());
-                t.start();
+                String message = "Resultados de consulta\n" + mongo.buscar(q, projection);
+                consoleLog(message);
             }
+            else if(isJSONValid(q)){
+                String message = "Resultados de consulta\n" + mongo.buscar(q, projection);
+                consoleLog(message);
+            }
+            else{
+                consoleLog("No es posible realizar una busqueda");
+            }
+            preQuery.getSelectionModel().clearSelection();
         });
+
         mapReduce.setOnAction(event -> {
-            Task task = new Task() {
-                @Override
-                protected Void call() throws Exception {
-                    String aux = mongo.mapReduce();
-                    this.updateMessage(aux);
-                    return null;
-                }
-            };
-            Thread t = new Thread(task);
-            console.textProperty().bind(task.messageProperty());
-            t.start();
+            String message = mongo.mapReduce();
+            consoleLog(message);
         });
     }
 
@@ -173,5 +170,29 @@ public class ControllerMain implements Initializable {
             }
         }
         return true;
+    }
+
+    private void consoleLog(String message){
+        final String messageFinal = message;
+        Task task = new Task() {
+            @Override
+            protected Void call() throws Exception {
+                this.updateMessage(messageFinal);
+                return null;
+            }
+        };
+        Thread t = new Thread(task);
+        console.textProperty().bind(task.messageProperty());
+        t.start();
+    }
+
+    private String parseProject(){
+        String s = project.getText();
+        if(s.equals(""))
+            return "{_id:1, TITLE:1}";
+        else if(isJSONValid(s))
+            return s;
+        else
+            return "{_id:1, TITLE:1}";
     }
 }
