@@ -11,32 +11,23 @@
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="940.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ControllerMain">
    <children>
       <TextField fx:id="collName" layoutX="14.0" layoutY="14.0" prefWidth="370.0" promptText="Collection Name" />
-      <TextField fx:id="filePath" layoutX="477.0" layoutY="14.0" prefWidth="370.0" promptText="File Path" />
-      <TextArea fx:id="console" editable="false" layoutX="14.0" layoutY="212.0" prefHeight="350.0" prefWidth="912.0" />
       <Button fx:id="save" layoutX="398.0" layoutY="14.0" mnemonicParsing="false" prefWidth="65.0" text="Save" />
+      <TextField fx:id="filePath" layoutX="477.0" layoutY="14.0" prefWidth="370.0" promptText="File Path" />
       <Button fx:id="load" layoutX="861.0" layoutY="14.0" mnemonicParsing="false" prefWidth="65.0" text="Load" />
       <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="59.0" prefHeight="140.0" prefWidth="912.0" text="Consultas">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="189.0" prefWidth="910.0">
                <children>
-                  <TextField fx:id="query" layoutX="14.0" layoutY="14.0" prefWidth="370.0" promptText="Query">
-                     <contextMenu>
-                        <ContextMenu>
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="{&quot;TOPICS&quot;:{$all:[&quot;sugar&quot;]}, &quot;PLACES&quot;:{$all:[&quot;indonesia&quot;]}}" />
-                              <MenuItem mnemonicParsing="false" text="{$text : {$search : &quot;colombia coffee&quot;}}" />
-                          </items>
-                        </ContextMenu>
-                     </contextMenu>
-                  </TextField>
-                  <ComboBox fx:id="preQuery" layoutX="14.0" layoutY="61.0" prefHeight="31.0" prefWidth="633.0" promptText="Querys predefinidos" />
-                  <TextField fx:id="project" layoutX="479.0" layoutY="14.0" prefHeight="31.0" prefWidth="370.0" promptText="Projection" text="{_id:0, TITLE:1, NEWID:1}" />
+                  <TextField fx:id="query" layoutX="14.0" layoutY="14.0" prefWidth="370.0" promptText="Query" />
                   <Label layoutX="398.0" layoutY="19.0" text="Projection:" />
+                  <TextField fx:id="project" layoutX="479.0" layoutY="14.0" prefHeight="31.0" prefWidth="370.0" promptText="Projection" text="{_id:0, TITLE:1, NEWID:1}" />
+                  <ComboBox fx:id="preQuery" layoutX="14.0" layoutY="61.0" prefHeight="31.0" prefWidth="633.0" promptText="Querys predefinidos" />
                   <Button fx:id="search" layoutX="664.0" layoutY="61.0" mnemonicParsing="false" prefWidth="65.0" text="Search" />
                   <Button fx:id="mapReduce" layoutX="742.0" layoutY="61.0" mnemonicParsing="false" prefWidth="105.0" text="MapReduce" />
                </children>
             </AnchorPane>
         </content>
       </TitledPane>
+      <TextArea fx:id="console" editable="false" layoutX="14.0" layoutY="212.0" prefHeight="350.0" prefWidth="912.0" />
    </children>
 </Pane>

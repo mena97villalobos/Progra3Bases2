@@ -1,6 +1,5 @@
 package Controller;
 
-import Model.Alertas;
 import Model.ArrayFields;
 import Model.MongoConnection;
 import Model.XmltoJson;
