@@ -30,7 +30,7 @@
                      </contextMenu>
                   </TextField>
                   <ComboBox fx:id="preQuery" layoutX="14.0" layoutY="61.0" prefHeight="31.0" prefWidth="633.0" promptText="Querys predefinidos" />
-                  <TextField fx:id="project" layoutX="479.0" layoutY="14.0" prefHeight="31.0" prefWidth="370.0" promptText="Projection" text="{_id:1, TITLE:1}" />
+                  <TextField fx:id="project" layoutX="479.0" layoutY="14.0" prefHeight="31.0" prefWidth="370.0" promptText="Projection" text="{_id:0, TITLE:1, NEWID:1}" />
                   <Label layoutX="398.0" layoutY="19.0" text="Projection:" />
                   <Button fx:id="search" layoutX="664.0" layoutY="61.0" mnemonicParsing="false" prefWidth="65.0" text="Search" />
                   <Button fx:id="mapReduce" layoutX="742.0" layoutY="61.0" mnemonicParsing="false" prefWidth="105.0" text="MapReduce" />

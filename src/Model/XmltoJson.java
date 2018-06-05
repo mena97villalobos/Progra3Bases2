@@ -7,8 +7,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
+import javafx.concurrent.Task;
 import org.json.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,30 +17,19 @@ import org.jsoup.parser.Parser;
 
 public class XmltoJson {
 
-    public String jsonInicial = "";
-    public String xmlFile = "";
-
-    public ArrayList XMLtoJSON(String file, String filename) {
-        ArrayList<File> files = new ArrayList<>();
+    public void XMLtoJSON(String file, String filename, MongoConnection mongo) {
         try {
-            String XMLString = "";
-            XMLString = readFile(file, Charset.forName("UTF-8"));//new Scanner(file, "UTF-8").next();
+            String XMLString;
+            XMLString = readFile(file, Charset.forName("UTF-8"));
             Document doc = Jsoup.parse(XMLString, "", Parser.xmlParser());
-            String jsonFinal = "";
-            for (Element e : doc.select("REUTERS")) {
-                JSONObject jsonObj = null;
-                jsonObj = XML.toJSONObject(e.toString());
-                jsonFinal += jsonObj.toString() + "\n";
-            }
-            String json = "";
-            String[] docs = jsonFinal.split("\n");
             int i = 0;
-            for (String s : docs) {
+            String pattern = "\"\\w+\":\\s*(\"*)(NOCONTENT)(\"*).*";
+            Pattern p = Pattern.compile(pattern);
+            for (Element e : doc.select("REUTERS")) {
+                StringBuilder json = new StringBuilder();
                 ArrayList<String> datos =new ArrayList<>();
-
-                JSONObject obj = new JSONObject(s).getJSONObject("REUTERS");
-
-                datos.add("\"_id\":\"" + obj.getInt("NEWID") + "\", "); //String newidContent
+                JSONObject obj = XML.toJSONObject(e.toString()).getJSONObject("REUTERS"); //new JSONObject(s).getJSONObject("REUTERS");
+                datos.add("\"NEWID\":" + Integer.toString(obj.getInt("NEWID")) + ", "); //String newidContent
                 datos.add("\"DATE\":\"" + parseTag(obj, "DATE", false) + "\", "); //String dateContent
                 datos.add("\"TOPICS\":" + parseTag(obj, "TOPICS", true) + ", "); //String topicsContent
                 datos.add("\"PLACES\":" + parseTag(obj, "PLACES", true) + ", "); //String placesContent
@@ -51,39 +40,39 @@ public class XmltoJson {
                 datos.add("\"AUTHOR\":\"" + parseTag(obj.getJSONObject("TEXT"), "AUTHOR", false) + "\", "); //String authorContent
                 datos.add("\"DATELINE\":\"" + parseTag(obj.getJSONObject("TEXT"), "DATELINE", false) + "\", "); //String datelineContent
                 datos.add("\"BODY\":\"" + parseTag(obj.getJSONObject("TEXT"), "BODY", false) + "\","); //String bodyContent
-                String pattern = "\"\\w+\":\\s*(\"*)(NOCONTENT)(\"*).*";
-                Pattern p = Pattern.compile(pattern);
-                json += "{";
+                json.append("{");
                 for (String dato : datos) {
                     Matcher matcher = p.matcher(dato);
                     if(!matcher.find()){
-                        json += dato;
+                        json.append(dato);
                     }
                 }
-                json += "}";
-                writeJSON(json, filename + "_" + String.valueOf(i) + ".json");
-                files.add(new File(filename + "_" + String.valueOf(i) + ".json"));
-                json = "";
+                json.append("}");
+                writeJSON(json.toString(), filename + "_" + String.valueOf(i) + ".json");
+                mongo.cargarDatos(json.toString());
                 i++;
             }
         }
-        catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return files;
+        catch (FileNotFoundException e){}
+        catch (IOException e) {}
     }
 
-
     private void writeJSON(String json, String filename){
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(filename), "utf-8"))) {
-            writer.write(json);
-        }
-        catch (FileNotFoundException e){}
-        catch (UnsupportedEncodingException e){}
-        catch (IOException e) {}
+        Task task = new Task() {
+            @Override
+            protected Void call(){
+                try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(filename), "utf-8"))) {
+                    writer.write(json);
+                }
+                catch (FileNotFoundException e){}
+                catch (UnsupportedEncodingException e){}
+                catch (IOException e) {}
+                return null;
+            }
+        };
+        Thread t = new Thread(task);
+        t.start();
     }
 
     private String parseTag(JSONObject json, String tag, boolean isArray){
@@ -106,7 +95,7 @@ public class XmltoJson {
                     if(!((JSONArray) o).get(1).equals("")) {
                         Object o1 = new JSONObject(((JSONArray) o).get(1).toString()).get("D");
                         if (o1 instanceof JSONArray) {
-                            return ((JSONArray) o1).toString();
+                            return o1.toString();
                         }
                         if (o1.toString().equals(""))
                             return "NOCONTENT";
@@ -129,7 +118,7 @@ public class XmltoJson {
         return content.replace("\"", "");
     }
 
-    static String readFile(String path, Charset encoding)
+    private static String readFile(String path, Charset encoding)
             throws IOException
     {
         byte[] encoded = Files.readAllBytes(Paths.get(path));

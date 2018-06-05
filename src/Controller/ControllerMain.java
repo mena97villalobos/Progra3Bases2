@@ -1,5 +1,6 @@
 package Controller;
 
+import Model.Alertas;
 import Model.ArrayFields;
 import Model.MongoConnection;
 import Model.XmltoJson;
@@ -7,10 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.json.*;
 import java.io.File;
 import java.net.URL;
@@ -33,7 +31,7 @@ public class ControllerMain implements Initializable {
     @FXML
     public Button search;
     @FXML
-    public ComboBox preQuery;
+    public ComboBox<String> preQuery;
     @FXML
     public Button mapReduce;
     @FXML
@@ -56,7 +54,7 @@ public class ControllerMain implements Initializable {
 
         save.setOnAction(event -> {
             String collection = collName.getText();
-            if(collection != "") {
+            if(!collection.equals("")) {
                 mongo.crearCollection(collection);
                 load.setDisable(false);
                 filePath.setDisable(false);
@@ -70,7 +68,7 @@ public class ControllerMain implements Initializable {
 
         load.setOnAction(event -> {
             String pathText = filePath.getText();
-            if (pathText != "") {
+            if (!pathText.equals("")) {
                 filePath.setDisable(true);
                 collName.setDisable(true);
                 load.setDisable(true);
@@ -79,26 +77,22 @@ public class ControllerMain implements Initializable {
                 search.setDisable(true);
                 Task task = new Task() {
                     @Override
-                    protected Void call() throws Exception {
+                    protected Void call(){
                         File file = new File(filePath.getText());
                         ArrayList<File> files = new ArrayList<>();
-                        ArrayList<File> creados = new ArrayList<>();
                         if (file.isDirectory()) {
-                            this.updateMessage("Recorriendo directorios");
                             files = recorrerDir(file);
                         } else {
                             files.add(file);
                         }
                         for (File f : files) {
                             String nombreSalida = "salidasJSON/" + f.getName().replace(".xml", "");
-                            this.updateMessage(console.getText() + "\n" + "Conviertiendo: " + f.getName());
-                            creados.addAll(conversor.XMLtoJSON(f.getPath(), nombreSalida));
+                            this.updateMessage(console.getText() + "\n" + "Convietiendo: " + nombreSalida);
+                            conversor.XMLtoJSON(f.getPath(), nombreSalida, mongo);
                         }
-                        String message = console.getText() + "\n" + mongo.cargarDatos(creados);
-                        this.updateMessage(message);
                         for (ArrayFields field : ArrayFields.values()) {
                             mongo.crearIndex(field.toString());
-                            consoleLog(console.getText() + "\n" + "Creando indice para: " + field.toString());
+                            consoleLog(console.getText() + "\nCreando indices");
                         }
                         mongo.createTextIndex();
                         this.updateMessage(console.getText() + "\nCreando indices de texto");
@@ -120,7 +114,7 @@ public class ControllerMain implements Initializable {
 
         search.setOnAction(event -> {
             String projection = parseProject();
-            String selectedPreQuery = (String) preQuery.getSelectionModel().getSelectedItem();
+            String selectedPreQuery = preQuery.getSelectionModel().getSelectedItem();
             String q = query.getText();
             if(q.equals("") && selectedPreQuery == null){
                 consoleLog("No es posible realizar una busqueda");
@@ -149,6 +143,7 @@ public class ControllerMain implements Initializable {
     private ArrayList<File> recorrerDir(File f){
         File[] files = f.listFiles();
         ArrayList<File> returnValue = new ArrayList<>();
+        assert files != null;
         for (File file : files) {
             if(file.isDirectory()){
                 returnValue.addAll(recorrerDir(file));
@@ -177,7 +172,7 @@ public class ControllerMain implements Initializable {
         final String messageFinal = message;
         Task task = new Task() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call(){
                 this.updateMessage(messageFinal);
                 return null;
             }
