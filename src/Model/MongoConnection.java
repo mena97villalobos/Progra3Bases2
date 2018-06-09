@@ -45,7 +45,8 @@ public class MongoConnection {
     }
 
     public void createTextIndex(){
-        collection.createIndex(Document.parse("{TEXT:\"text\", BODY:\"text\"}"));}
+        collection.createIndex(Document.parse("{\"TEXT.TITLE\":\"text\", \"TEXT.BODY\":\"text\"}"));
+    }
 
     public void crearIndex(String field){
         try {
@@ -60,13 +61,13 @@ public class MongoConnection {
         DBCollection dbCollection = databaseMR.getCollection(this.collectionName);
         String map = "function() {\n" +
                     "try{\n"+
-                    "for(var i = 0; i < this.PLACES.length; i++ ){\n" +
-                        "var key = this.PLACES[i];\n" +
-                        "emit(key, 1);\n" +
-                    "}\n" +
+                        "for(var i = 0; i < this.PLACES.length; i++ ){\n" +
+                            "var key = this.PLACES[i];\n" +
+                            "emit(key, 1);\n" +
+                        "}\n" +
                     "}" +
                     "catch(err){\n"+
-                    "emit(\"UNKOWN\", 1)" +
+                        "emit(\"UNKOWN\", 1)" +
                     "}"+
                 "}";
         String reduce = "function(key, values){\n" +

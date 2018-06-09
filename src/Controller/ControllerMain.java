@@ -18,6 +18,8 @@ public class ControllerMain implements Initializable {
     @FXML
     public TextField filePath;
     @FXML
+    public TextField outPath;
+    @FXML
     public TextField collName;
     @FXML
     public Button load;
@@ -70,10 +72,13 @@ public class ControllerMain implements Initializable {
             if (!pathText.equals("")) {
                 filePath.setDisable(true);
                 collName.setDisable(true);
+                outPath.setDisable(true);
                 load.setDisable(true);
                 save.setDisable(true);
                 mapReduce.setDisable(true);
                 search.setDisable(true);
+                String salida = outPath.getText();
+                if (!salida.equals("")){
                 Task task = new Task() {
                     @Override
                     protected Void call(){
@@ -85,19 +90,22 @@ public class ControllerMain implements Initializable {
                             files.add(file);
                         }
                         for (File f : files) {
-                            String nombreSalida = "salidasJSON/" + f.getName().replace(".xml", "");
+                            String nombreSalida = salida + f.getName().replace(".xml", "");
                             this.updateMessage(console.getText() + "\n" + "Convietiendo: " + nombreSalida);
                             conversor.XMLtoJSON(f.getPath(), nombreSalida, mongo);
                         }
+                        consoleLog("");
                         for (ArrayFields field : ArrayFields.values()) {
+                            consoleLog(console.getText() + "\nCreando indice: " + field.toString());
                             mongo.crearIndex(field.toString());
-                            consoleLog(console.getText() + "\nCreando indices");
                         }
+                        consoleLog(console.getText() + "\nCreando indices de texto");
                         mongo.createTextIndex();
-                        this.updateMessage(console.getText() + "\nCreando indices de texto");
+                        consoleLog("Indices Creados");
                         filePath.setDisable(false);
                         collName.setDisable(false);
                         load.setDisable(false);
+                        outPath.setDisable(false);
                         mapReduce.setDisable(false);
                         search.setDisable(false);
                         return null;
@@ -105,7 +113,11 @@ public class ControllerMain implements Initializable {
                 };
                 Thread t = new Thread(task);
                 console.textProperty().bind(task.messageProperty());
-                t.start();
+                t.start();}
+                else {
+                    consoleLog("Se necesita un path de salida");
+                    outPath.setText("salidasJSON/");
+                }
             }
             else
                 console.setText("File path needed");

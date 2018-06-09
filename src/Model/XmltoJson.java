@@ -36,10 +36,12 @@ public class XmltoJson {
                 datos.add("\"PEOPLE\":" + parseTag(obj, "PEOPLE",true) + ", "); //String peopleContent
                 datos.add("\"ORGS\":" + parseTag(obj, "ORGS", true) + ", "); //String orgsContent
                 datos.add("\"EXCHANGES\":" + parseTag(obj, "EXCHANGES", true) + ", "); //String exchangesContent
+                datos.add("\"TEXT\":{"); //Anidar los datos del tag TEXT
                 datos.add("\"TITLE\":\"" + parseTag(obj.getJSONObject("TEXT"), "TITLE", false) + "\", "); //String titleContent
                 datos.add("\"AUTHOR\":\"" + parseTag(obj.getJSONObject("TEXT"), "AUTHOR", false) + "\", "); //String authorContent
                 datos.add("\"DATELINE\":\"" + parseTag(obj.getJSONObject("TEXT"), "DATELINE", false) + "\", "); //String datelineContent
                 datos.add("\"BODY\":\"" + parseTag(obj.getJSONObject("TEXT"), "BODY", false) + "\","); //String bodyContent
+                datos.add("}"); //Anidar los datos del tag TEXT
                 json.append("{");
                 for (String dato : datos) {
                     Matcher matcher = p.matcher(dato);
@@ -118,8 +120,7 @@ public class XmltoJson {
         return content.replace("\"", "");
     }
 
-    private static String readFile(String path, Charset encoding)
-            throws IOException
+    private static String readFile(String path, Charset encoding) throws IOException
     {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);

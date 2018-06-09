@@ -8,19 +8,19 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="940.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ControllerMain">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="593.0" prefWidth="940.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ControllerMain">
    <children>
-      <TextField fx:id="collName" layoutX="14.0" layoutY="14.0" prefWidth="370.0" promptText="Collection Name" />
-      <Button fx:id="save" layoutX="398.0" layoutY="14.0" mnemonicParsing="false" prefWidth="65.0" text="Save" />
-      <TextField fx:id="filePath" layoutX="477.0" layoutY="14.0" prefWidth="370.0" promptText="File Path" />
-      <Button fx:id="load" layoutX="861.0" layoutY="14.0" mnemonicParsing="false" prefWidth="65.0" text="Load" />
-      <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="59.0" prefHeight="140.0" prefWidth="912.0" text="Consultas">
+      <TextField fx:id="collName" layoutX="14.0" layoutY="31.0" prefHeight="31.0" prefWidth="211.0" promptText="Collection Name" />
+      <Button fx:id="save" layoutX="231.0" layoutY="31.0" mnemonicParsing="false" prefWidth="65.0" text="Save" />
+      <TextField fx:id="filePath" layoutX="305.0" layoutY="31.0" prefHeight="31.0" prefWidth="351.0" promptText="File Path" />
+      <Button fx:id="load" layoutX="861.0" layoutY="31.0" mnemonicParsing="false" prefWidth="65.0" text="Load" />
+      <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="76.0" prefHeight="140.0" prefWidth="912.0" text="Consultas">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="189.0" prefWidth="910.0">
                <children>
                   <TextField fx:id="query" layoutX="14.0" layoutY="14.0" prefWidth="370.0" promptText="Query" />
                   <Label layoutX="398.0" layoutY="19.0" text="Projection:" />
-                  <TextField fx:id="project" layoutX="479.0" layoutY="14.0" prefHeight="31.0" prefWidth="370.0" promptText="Projection" text="{_id:0, TITLE:1, NEWID:1}" />
+                  <TextField fx:id="project" layoutX="479.0" layoutY="14.0" prefHeight="31.0" prefWidth="370.0" promptText="Projection" text="{_id:0, &quot;TEXT.TITLE&quot; :1, NEWID:1}" />
                   <ComboBox fx:id="preQuery" layoutX="14.0" layoutY="61.0" prefHeight="31.0" prefWidth="633.0" promptText="Querys predefinidos" />
                   <Button fx:id="search" layoutX="664.0" layoutY="61.0" mnemonicParsing="false" prefWidth="65.0" text="Search" />
                   <Button fx:id="mapReduce" layoutX="742.0" layoutY="61.0" mnemonicParsing="false" prefWidth="105.0" text="MapReduce" />
@@ -28,6 +28,10 @@
             </AnchorPane>
         </content>
       </TitledPane>
-      <TextArea fx:id="console" editable="false" layoutX="14.0" layoutY="212.0" prefHeight="350.0" prefWidth="912.0" />
+      <TextArea fx:id="console" editable="false" layoutX="14.0" layoutY="229.0" prefHeight="350.0" prefWidth="912.0" />
+      <TextField fx:id="outPath" layoutX="663.0" layoutY="31.0" prefHeight="31.0" prefWidth="187.0" text="salidasJSON/" />
+      <Label layoutX="663.0" layoutY="4.0" text="Directorio de Salida" />
+      <Label layoutX="305.0" layoutY="4.0" text="Directorio de Archivos" />
+      <Label layoutX="14.0" layoutY="4.0" text="Nombre de la Colección" />
    </children>
 </Pane>
