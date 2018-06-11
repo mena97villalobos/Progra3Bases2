@@ -19,7 +19,7 @@ public class MongoConnection {
 
     public String buscar(String query, String projection){
         if(projection.equals("") || projection.equals("{}"))
-            projection = "{_id:0, NEWID:1, TITLE:1}";
+            projection = "{_id:0, \"TEXT.TITLE\" :1, NEWID:1}";
         StringBuilder results = new StringBuilder();
         ArrayList<Document> aggregation = new ArrayList<>();
         aggregation.add(Document.parse("{$match:" + query + "}"));
